@@ -9,7 +9,8 @@ import ProtectedRoute from './ProtectedRoute';
 import AuthRoute from './AuthRoute';
 import FetchUser from './FetchUser';
 import { Switch, Route } from 'react-router-dom';
-import {AppList} from './AppList'
+import GameApps from './GameApps';
+
 
 class App extends Component {
   render() {
@@ -22,6 +23,7 @@ class App extends Component {
             <Route exact path='/' component={Home} />
             <AuthRoute exact path='/login' component={Login} />
             <AuthRoute exact path='/register' component={Register} />
+            <ProtectedRoute path="/apps/:id" component={GameApps} />
             <Route component={NoMatch} />
           </Switch>
         </FetchUser>

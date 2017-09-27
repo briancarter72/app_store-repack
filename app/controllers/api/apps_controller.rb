@@ -6,6 +6,8 @@ class Api::AppsController < ApplicationController
   end
 
   def show
+    app = @app
+    render json: app
   end
 
   def create
@@ -26,6 +28,7 @@ class Api::AppsController < ApplicationController
   end
 
   def destroy
+    # @app or @api_app???
     @app.destroy
   end
 

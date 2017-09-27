@@ -1,30 +1,81 @@
 import React, { Component } from 'react';
-import { Header } from 'semantic-ui-react';
+import {  Link } from 'react-router-dom';
+import { Header, Container, Card, Image, Divider } from 'semantic-ui-react';
 import axios from 'axios';
+import Form from './Form';
 
 class Home extends Component {
-state = { apps: [] }
+  state = { apps: [], showForm: false }
 
-componentDidMount() {
-   axios.get('/api/apps')
-     .then( res => this.setState({ apps: res.data }) )
-   }
+  componentDidMount() {
+    axios.get('/api/apps')
+      .then( res => {this.setState({ apps: res.data })});
+  }
+
+  show = () => (
+    <div>
+      {this.state.apps.map( p =>
+        <div key={p.id}>
+          <Link to={`/apps/${p.id}`}>
+            {p.name}
+            {<img src={p.logo} alt={"logo"} height="100" width="150" />}
+            {' '}
+          </Link>
+        </div>
+      )}
+    </div>
+  )
+
+  submit = (app) => {
+    const { apps } = this.state;
+    axios.post('/api/apps', { app })
+      .then( res => {
+        this.setState({ apps: [res.data, ...apps], showForm: false })
+      })
+      .catch( e => console.log(e.response.data.errors))
+  }
+
+  form = () => {
+    return <Form submit={this.submit} />
+  }
+
+  toggleForm = () => this.setState({ showForm: !this.state.showForm });
 
   render() {
-    return (
-      <Header as='h1' textAlign='center'>App Store</Header>
-      { this.state.apps.map( app =>
-              <Card key={app.id}>
-                <h2>{app.name}</h2>
-                <Image src={app.logo} />
-                <h3>{app.category}</h3>
-                <h3>{app.version}</h3>
-              </Card>
+    const { showForm } = this.state;
+    let { apps } = this.state;
+    return(
+      <div>
+        <h2>App Store Apps</h2>
+          <button onClick={this.toggleForm}>
+            { showForm ? 'Hide Form' : 'New App'}
+          </button>
+          <Card.Group itemsPerRow={4}>
+            { apps.map( app =>
+            <Card key={app.id}>
+              <Link to={`/apps/${app.id}`}>
+                <Card.Content>
+                  <Image src={app.logo} />
+                  <Divider />
+                  <Card.Header>
+                    {app.name}
+                  </Card.Header>
+                </Card.Content>
+              </Link>
+            </Card>
             )
           }
-        </Cards>
-      );
-    }
+        </Card.Group>
+        <Container>
+          <Header>
+            <Card>
+              { showForm ? this.form() : this.show() }
+            </Card>
+          </Header>
+        </Container>
+      </div>
+    )
+  }
 }
 
 export default Home;
